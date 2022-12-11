@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: http://bdngo.github.io/eecs-106a-website/sitemap.xml
