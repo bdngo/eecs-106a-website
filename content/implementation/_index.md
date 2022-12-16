@@ -9,6 +9,12 @@ math: true
 
 {{< figure src="../img/fish-design.png" title="Hardware layout of FishBot" height=100% width=100% >}}
 
+The tail that is used for the robotic fish is an underactuated soft tail than was fabricated in the lab out of a mold.
+A waterproof servo motor provide the actuation to the tail causing it to move in a sinusoidal form allowing for motion underwater.
+An ArUco tag was used to determine the position of the fish using a webcam station above a water tank.
+An ESP32 served as our microcontroller to run the arduino code controlling the robot.
+A LiPo battery provided the necessary power to the servo motor.
+
 # Software
 
 ## ROS
@@ -98,6 +104,8 @@ where the sign is determined by the direction of desired motion.
 <!-- logistic map stuff -->
 
 # Wireless Communication
+
+{{< figure src="../img/wifi-diagram.png" title="Diagram of wireless communication protocol" height=100% width=100% >}}
 
 The microcontroller on the ESP32 _does not_ run ROS.
 The exact commands it needs to run are calculated on a host computer and transmitted wirelessly.
