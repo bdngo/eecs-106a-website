@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Introduction on EECS 106A Final Project</title>
+    <link>http://bdngo.github.io/eecs-106a-website/introduction/</link>
+    <description>Recent content in Introduction on EECS 106A Final Project</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 11 Dec 2022 15:37:51 -0800</lastBuildDate><atom:link href="http://bdngo.github.io/eecs-106a-website/introduction/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
