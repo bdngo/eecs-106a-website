@@ -120,7 +120,6 @@ Finally, the custom `motion_planner` and `controller` nodes are launched, creati
 ### `motion_planner.py`
 
 This node allows converts the location of a given target point and the current location of the fish into an error that the fish can control.
-
 This is sent to the `/controller` node to FishBot via the `/motion_plan` topic.
 It is communicated via a custom `FishError` message:
 
@@ -180,7 +179,7 @@ def joint_callback(self) -> None:
 
 ### `control.py`
 
-Utilizing the logistic map
+Utilizing the logistic map from our [design](../design/_index.md)
 
 Given the angular error \\(e_\theta\\), the equation used is
 \\[
@@ -314,7 +313,17 @@ void loop() {
 
 ## Computer Vision (CV)
 
-The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank. To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed. Then, we perform image processing using the functions in the OpenCV library. To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles. Then, we create a kernel and use it to remove some noise from the blue mask. Next, we use this final processed blue mask to form the threshold image of blue colors. Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing.
+The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank. To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed: 
 
-Here are the 
+Then, we perform image processing using the functions in the OpenCV library. To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles: 
+
+Then, we create a kernel and use it to remove some noise from the blue mask: 
+
+Next, we use this final processed blue mask to form the threshold image of blue colors: 
+
+Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing: 
+
+Here are the original and processed/thresholded images: 
+
+As you can see, the code performed the color thresholding pretty well but there are some limitations that requires some additional improvements in the future. One limitation was that since we also had some blue tape on the edges of the tank, the code also caught some of that 
 

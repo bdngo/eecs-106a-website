@@ -6,6 +6,8 @@ draft: true
 
 # Stanley Wang
 
+{{< figure src="../img/stanley.jpg" height=50% width=50% >}}
+
 # Bryan Ngo
 
 {{< figure src="../img/Bryan-Ngo.png" height=50% width=50% >}}

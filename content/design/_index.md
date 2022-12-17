@@ -29,3 +29,4 @@ From a realistic engineering perspective, our design choices lead to several adv
 Minimal leakage is observed even after 
 
 {{< figure src="../img/system-design.png" title="Overall system design of FishBot" height=100% width=100% >}}
+{{< figure src="../img/motion-planning.png" title="Theoretical path planning of FishBot" height=100% width=100% >}}
