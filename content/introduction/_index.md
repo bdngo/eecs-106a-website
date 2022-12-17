@@ -19,7 +19,7 @@ This system demonstrated agile swimming locomotion and floating body force appli
 
 {{< youtube hjUSrZqYUoo >}}
 
-{{< figure src="../img/force.png" title="Tearing forces applied to a compliant prey based on tail actuation parameters (Wang et al.)" height=100% width=100% >}}
+{{< figure src="../img/force.png" title="Tearing forces applied to a compliant prey based on tail actuation parameters (Wang (me, Stanley!) et al.)" height=100% width=100% >}}
 
 Although prior studies have established fundamental mechanical principles quantifying the kinematics and dynamics of soft underwater actuators, control and intelligence of these robots is an emerging field that requires further investigation.
 In this project, we explore the application of EECS/ME 106A principles toward the design of a comprehensive mechatronics project with sensing, planning, and actuation.

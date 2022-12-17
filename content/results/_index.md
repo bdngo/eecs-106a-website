@@ -1,10 +1,10 @@
 ---
 title: "Results"
 date: 2022-12-11T15:55:44-08:00
-draft: true
+draft: false
 ---
 
-We can define three separate stages of development for FishBot.
+We can define three separate milestones of FishBot's development.
 
 # 1. ArUco Tag-Based Target Acquisition
 

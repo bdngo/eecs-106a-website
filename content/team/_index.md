@@ -1,14 +1,22 @@
 ---
 title: "Team"
 date: 2022-12-11T15:55:55-08:00
-draft: true
+draft: false
 ---
 
 {{< figure src="../img/team.jpg" title="(From left to right) Stanley Wang, Bryan Ngo, Khalid Durani, Shaikh Shamsuddin, Eric Yang" height=100% width=100% >}}
 
 # Stanley Wang
+
 Stanley is currently a senior at UC Berkeley studying Mechanical Engineering.
-He is passionate about bio-inspired robotics and controls, and currently works in the Embodied Dexterity Group with Professor Hannah Stuart. He has been working on FishBot as an independent research project 
+He is passionate about bio-inspired robotics and controls, and currently works in the Embodied Dexterity Group with Professor Hannah Stuart. He has been working on FishBot as an independent research project since summer 2022 as part of the Jacobs Engineering Design Scholar Program. 
+
+## Contribution
+
+- Developed and debugged the hardware platform
+- High-level conceptualization of motion planning and control strategies
+- Extensive work in systems testing, development, and integration
+
 # Bryan Ngo
 
 Bryan is currently a senior at UC Berkeley studying electrical engineering and computer science.
@@ -36,7 +44,7 @@ Plans on having a career in embedded systems and intelligent robots in the space
 
 # Khalid Durani
 
-Khalid is currently a senior UC Berkeley studying Electrical Engineering and Computer Sciences.
+Khalid is currently a senior at UC Berkeley studying Electrical Engineering and Computer Sciences.
 He enjoys robotics and VLSI design.
 
 ## Contribution
@@ -52,5 +60,3 @@ Eric is a senior undergraduate student studying Electrical Engineering and Compu
 
 - Worked on CV and controller node implementations, including the OpenCV implementations for obstacle detection from images taken from the camera and initial controller designs.
 - Helped with various tasks on the hardware side, including the mechanical aspects of the FishBot and dealing with challenges associated with hardware and electronics.
-
-

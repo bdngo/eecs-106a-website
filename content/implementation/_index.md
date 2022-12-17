@@ -1,7 +1,7 @@
 ---
 title: "Implementation"
 date: 2022-12-11T16:26:50-08:00
-draft: true
+draft: false
 math: true
 ---
 
@@ -59,7 +59,9 @@ eecs-106a-project
 
 ## ROS
 
-The current ROS workflow can be entirely run with the following command (given `roscore` is running and the proper files have been sourced):
+{{< figure src="../img/rqt-graph.png" title="Output of `rqt_graph` for target acquisition milestone" height=100% width=100% >}}
+
+The current (target node) ROS workflow can be entirely run with the following command (given `roscore` is running and the proper files have been sourced):
 ```bash
 roslaunch fishbot init.launch
 ```
@@ -126,6 +128,58 @@ This initializes the raw camera feed and enables ArUco tag detection.
 Finally, the custom `motion_planner` and `controller` nodes are launched, creating the full ROS workflow.
 
 ### `cv.py`
+
+The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank.
+To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed: 
+
+```python
+cv_image = cv2.imread("cv_image.png")
+
+# downsample cv_image by a factor of 2 using nearest interpolation
+img_d = cv2.resize(src=cv_image, dsize=(cv_image.shape[1]//2, cv_image.shape[0]//2), interpolation=cv2.INTER_NEAREST)
+```
+
+Then, we perform image processing using the functions in the OpenCV library.
+To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles.
+Then, we create a kernel and use it to remove some noise from the blue mask. Next, we use this final processed blue mask to form the threshold image of blue colors: 
+
+```python
+hsvFrame = cv2.cvtColor(img_d, cv2.COLOR_BGR2HSV)
+
+# define BGR lower and upper limits to threshold blue color
+blue_lower = np.array([100, 80, 10], np.uint8)
+blue_upper = np.array([120, 255, 255], np.uint8)
+
+# creates a mask
+blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+
+# creates a kernel used to remove from mask
+kernel = np.ones((7, 7), np.uint8)
+
+# remove noise from the mask
+blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_CLOSE, kernel)
+blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+
+# creates thresholded blue image using the mask
+thresholded_img = cv2.bitwise_and(img_d, img_d, mask=blue_mask)
+```
+
+Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing: 
+
+```python
+# upsample the image back to the original cv_image by a factor of 2 using nearest interpolation
+img_u = cv2.resize(src=thresholded_img, dsize=(cv_image.shape[1], cv_image.shape[0]), interpolation=cv2.INTER_NEAREST)
+img_u = img_u.astype(np.uint8)
+```
+
+Here are the original and processed/thresholded images: 
+
+{{< figure src="../img/before-cv.png" title="Original image prior to processing" height=100% width=100% >}}
+{{< figure src="../img/after-cv.png" title="Color-segmented image" height=100% width=100% >}}
+
+As you can see, the code performed the color thresholding pretty well but there are some limitations that require some additional improvements in the future.
+One limitation was that since we also had some blue tape on the edges of the tank, the code also caught some of those areas.
+To ensure that only the obstacles are detected by the thresholding algorithm, we need to make sure that only the two obstacles themselves are blue.
 
 ### `motion_planner.py`
 
@@ -228,7 +282,7 @@ Utilizing the logistic map from our [design](../design/), we can derive the nece
         \frac{1}{B} \ln\left(\frac{A}{|e_\theta|} - 1\right) + C & \text{otherwise}
     \end{cases}
 \\]
-where \\(A\\) and \\(B\\) are constants experimentally derived, and \\(e_\theta\\) is the angular error in degrees.
+where \\(A\\) and \\(B\\) are experimentally derived constants, and \\(e_\theta\\) is the angular error in degrees.
 The sign of the strength is determined by the direction of desired motion.
 The result is saturated to between both safe angular displacements allowed by FishBot's motor and overcoming the viscosity of water.
 
@@ -312,7 +366,6 @@ void setup() {
 
 Before we go into our loop function that will constanly feed motion commands to FishBot, we must define a method for moving its tail.
 The `move_tail` function takes in the total amount of time (`moving_time`) that the FishBot should move for and generates a linear map between the angular displacement of FishBot's tail and the servo motor angle.
-The loop terminates when 
 
 ```arduino
 void move_tail(int a, int b, unsigned long moving_time) {
@@ -356,56 +409,3 @@ void loop() {
   }
 }
 ```
-
-## Computer Vision (CV)
-
-The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank.
-To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed: 
-
-```python
-cv_image = cv2.imread("cv_image.png")
-
-# downsample cv_image by a factor of 2 using nearest interpolation
-img_d = cv2.resize(src=cv_image, dsize=(cv_image.shape[1]//2, cv_image.shape[0]//2), interpolation=cv2.INTER_NEAREST)
-```
-
-Then, we perform image processing using the functions in the OpenCV library.
-To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles.
-Then, we create a kernel and use it to remove some noise from the blue mask. Next, we use this final processed blue mask to form the threshold image of blue colors: 
-
-```python
-hsvFrame = cv2.cvtColor(img_d, cv2.COLOR_BGR2HSV)
-
-# define BGR lower and upper limits to threshold blue color
-blue_lower = np.array([100, 80, 10], np.uint8)
-blue_upper = np.array([120, 255, 255], np.uint8)
-
-# creates a mask
-blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
-
-# creates a kernel used to remove from mask
-kernel = np.ones((7, 7), np.uint8)
-
-# remove noise from the mask
-blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_CLOSE, kernel)
-blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
-
-# creates thresholded blue image using the mask
-thresholded_img = cv2.bitwise_and(img_d, img_d, mask=blue_mask)
-```
-
-Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing: 
-
-```python
-# upsample the image back to the original cv_image by a factor of 2 using nearest interpolation
-img_u = cv2.resize(src=thresholded_img, dsize=(cv_image.shape[1], cv_image.shape[0]), interpolation=cv2.INTER_NEAREST)
-img_u = img_u.astype(np.uint8)
-```
-
-Here are the original and processed/thresholded images: 
-
-[ADD 2 IMAGES!!!!!!!!!!!!!]
-
-As you can see, the code performed the color thresholding pretty well but there are some limitations that require some additional improvements in the future.
-One limitation was that since we also had some blue tape on the edges of the tank, the code also caught some of those areas.
-To ensure that only the obstacles are detected by the thresholding algorithm, we need to make sure that only the two obstacles themselves are blue.
