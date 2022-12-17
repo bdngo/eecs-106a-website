@@ -62,7 +62,7 @@ params:
     title: Fishbot 🐠
     subtitle: "EECS 106A Final Project Report"
     imageUrl: "img/fishbot.jpg"
-    imageWidth: 800
+    imageWidth: 1200
     imageHeight: 600
     imageTitle: my image
     # buttons:

@@ -23,6 +23,8 @@ Interests include digital signal processing, computer architecture, and compiler
 
 # Shaikh Shamsuddin
 
+{{< figure src="../img/Shaikh.jpg" height=50% width=50% >}}
+
 Shaikh is currently a senior at UC Berkeley studying electrical engineering and computer science.
 He is a researcher working for Dr. Waqas Khalid in the Nanotechnology laboratory.
 Enjoys studying robotics, intelligent systems, and embedded-systems.
