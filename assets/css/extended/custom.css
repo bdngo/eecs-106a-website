@@ -1,3 +1,7 @@
 .chroma {
     background-color: unset;
 }
+
+figcaption {
+  text-align: center;
+}

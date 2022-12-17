@@ -21,7 +21,6 @@ The tradeoff here is primarily the additional weight added from these components
 - **Communications**: Wireless communication is necessary in order to connect our robot with our computer ROS system.
 This is implemented using an HTTP server with our microcontroller.
 The microcontroller is attached to the flotation device of the robot to ensure the antenna is not submerged, since WiFi does not travel well through the air-water interface.
-
 The tradeoff here lies in the additional layer of complexity, which introduces another potential point of failure in the system.
 
 From a realistic engineering perspective, our design choices lead to several advantageous and disadvantageous outcomes:

@@ -23,3 +23,7 @@ The dynamics of the FishBot was improved to incorporate the logistic curve fit o
 In the video below, we can visually see the calibrated control-points that the FishBot maneuvers to in order to reach the final target position.
 
 {{< youtube 4HTXYV4v8Os >}}
+
+# 3. CV + Occupancy Grid Motion Planning
+
+Using a Bird's-eye camera, we can use it to analyze the current state of the tank that the FishBot is in. Then, we can generate a binary occupancy grid using color detection. What this means is that for each coordinate in the grid, it'll either be occupied or unoccupied. As a result, the FishBot can calculate the its optimal trajectory using this new model and we can remove the need for predefined calibrated control points for the FishBot to plan its trajectory towards. We currently have a code structured written to implement this design, but due to the time frame, we were unable to test this implementation before the FishBot enviornment was put away for the winter.

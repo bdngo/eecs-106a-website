@@ -12,18 +12,14 @@ math: true
 Our hardware implementation consists of several key components as highlighted in the above figure. This includes:
 
 - **Underactuated Soft Tail** The tail mechanism is the primary actuator for our robot. It consists of a series of rigid segmented "ribs" joined together by revolute joints. From a kinematic perspective, this forms a multi-bar linkage system with a high degree of freedom. However, this entire mechanism is actuated by a single capstan cable drive connected to our servomotor. When tension is applied in either direction in the cable, an overall deflection left/right is respectively produced in the overall tail. This highly underactuated assembly is then encased by a soft flexible sleeve cast from silicone rubber (Smooth-On DragonSkin 10). This sleeve acts as the caudal fin of our fish robot, enabling undulatory propulstion through the water. 
-INSERT TAIL FIGURE
+
+{{< figure src="../img/logistic-map.png" title="Logistic mapping for tail angle" height=100% width=100% >}}
+
 - **Waterproof Servomotor** A waterproof servomotor is sourced with appropriate specifications to meet both speed and torque requirements for driving the tail mechanism. After assessing potential solutions, we utilize a FlashHobby 35kg metal geared servo from Amazon, with specifications listed below.
 INSERT SERVO TABLE/FIGURE
-- **Electronics Compartment** A waterproof compartment is used to house a 2S 
-- **ArUco Tag**
-- **Microcontroller (WiFi Antenna)**
-
-The tail that is used for the robotic fish is an underactuated soft tail than was fabricated in the lab out of a mold.
-A waterproof servo motor provide the actuation to the tail causing it to move in a sinusoidal form allowing for motion underwater.
-An ArUco tag was used to determine the position of the fish using a webcam station above a water tank.
-An ESP32 served as our microcontroller to run the arduino code controlling the robot.
-A LiPo battery provided the necessary power to the servo motor.
+- **Electronics Compartment** A waterproof compartment is used to house a 2S 7.4V LiPo battery used to power our servomotor. This compartment is fabricated from standard PLA material using a desktop FDM 3D printer. The part is then treated for water resistance by painting with an XTC-3D epoxy coating. A lid for easy access is laser cut from 1/4" acrylic, and secured to the compartment with M3 bolts and an O-ring gasket.
+- **ArUco Tag** The pose of the FishBot is extracted from an ArUco tag affixed to the front of the robot. This is created by hand-painting a thin wooden sheet using a permanent marker in order to create a waterproof component (standard printer paper quickly dissolves and loses integrity when submerged).
+- **Microcontroller (WiFi Antenna)** Lastly, a floating anchor is created using a small section of pool noodle. The FishBot is affixed to this anchor at its center of gravity in order to ensure proper balance in the water. The ESP32 microcontroller is then affixed to this float and waterproofed using a plastic sheet. This is done to ensure the antenna on our microcontroller is above water, since we determined that WiFi has substantial issues transmitting through water.
 
 # Software
 
@@ -184,6 +180,8 @@ def joint_callback(self) -> None:
 
 ### `control.py`
 
+Utilizing the logistic map
+
 Given the angular error \\(e_\theta\\), the equation used is
 \\[
     |S| =
@@ -194,6 +192,7 @@ Given the angular error \\(e_\theta\\), the equation used is
     \end{cases}
 \\]
 where the sign is determined by the direction of desired motion.
+The result is saturated to safe angular displacements allowed by FishBot's motor.
 <!-- logistic map stuff -->
 
 # Wireless Communication
@@ -224,7 +223,8 @@ This setup has a latency on the order of hundreds of milliseconds.
 ## ESP32
 
 The ESP32 connects to a locally hosted server that will send the motion commands to the FishBot. By connecting to the server through Wi-Fi, the FishBot can persistently see the commands being fed by the control node from the ROS running on a host system. 
-```c
+After reading the commands from the server, it decides on one of three motions for the FishBot: move straight forward, turn left by some angle, or turn right by some angle.
+```cpp
 String http_GET_request(const char* server) {
   HTTPClient http;
     
@@ -243,9 +243,11 @@ String http_GET_request(const char* server) {
   return payload;
 }
 ```
-After reading the commands from the server, it decides on one of three motions for the FishBot: move straight forward, turn left by some angle, or turn right by some angle.
-The servomotor is controlled by the ESP32, which means that we needed to import the "ESP32Servo" library so that the microcontroller can communicate with and control the servo motor. With this library we enabled the ESP32 to correctly intialize the servo motor with the correct frequency, PWM, and angles needed to achieve the desired motion of the FishBot.
-```c
+
+The ESP32 controls the servo motor. This means that we need to import the `"ESP32Servo.h"` library so that the microcontroller can control the servo motor using the appropiate functions provided by this library. 
+In conjuction, the ESP32 needs to initialize/set up several components necessary for achieving the desired motion of the FishBot, including the wireless connection, the trim of the servo motor, and the desired frequency.
+
+```cpp
 void setup() {
   // put your setup code here, to run once:
 
@@ -268,8 +270,10 @@ void setup() {
   delay(1000);
 }
 ```
-After initializing the ESP32 with the necessary setup code, we run a loop that constantly downloads and parses the server's messages so that it can dynamically change the behavior of the servo motor inherently changing the behviour of the FishBot's motion.
-```c
+
+After initializing the ESP32 with the necessary setup code, we run a loop that constantly downloads and parses the server's messages. This allows the controller to dynamically change the behavior of the servo motor, thereby influencing the FishBot's motion on the fly.
+
+```cpp
 void move_tail(int a, int b, unsigned long moving_time) {
   unsigned long moveStartTime = millis(); // time when start moving
   unsigned long progress = 0;
@@ -309,5 +313,8 @@ void loop() {
 ```
 
 ## Computer Vision (CV)
-The goal of the computer vision node is to To implement the computer vision node, we first downsampled the image by a factor of 2
+
+The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank. To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed. Then, we perform image processing using the functions in the OpenCV library. To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles. Then, we create a kernel and use it to remove some noise from the blue mask. Next, we use this final processed blue mask to form the threshold image of blue colors. Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing.
+
+Here are the 
 
