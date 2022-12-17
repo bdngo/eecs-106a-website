@@ -49,7 +49,7 @@ He enjoys robotics and VLSI design.
 
 ## Contribution
 
-- Worked on the motion planning and controller for the FishBot.
+- Worked on the motion planning and controller nodes for the FishBot.
 - Aided in fixing hardware/electronics issues and testing the FishBot in a tank.
 
 # Eric Yang
