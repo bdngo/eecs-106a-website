@@ -4,7 +4,7 @@ date: 2022-12-11T15:55:36-08:00
 draft: true
 ---
 
-{{< figure src="../img/hw-design.png" title="Hardware design of FishBot" height=100% width=100% >}}
+{{< figure src="../img/tail-design.png" title="Hardware design of FishBot" height=100% width=100% >}}
 
 The mechanical design of our fish robot is largely based on the prior platform developed by Wang (me, Stanley!) et al.
 The underactuated tail consists of 5 linkage segments actuated by a single cable drive, with a soft silicone sleeve for underwater propulsion.

@@ -4,7 +4,7 @@ date: 2022-12-11T15:37:51-08:00
 draft: false
 ---
 
-{{< figure src="../img/reef.png" title="" height=100% width=100% >}}
+{{< figure src="../img/reef.png" title="Coral Reefs in Decline (Source: The Guardian)" height=100% width=100% >}}
 
 In recent years, coral reefs have become severely threatened by a shifting global ecosystem.
 Damage to reefs has been occurring at an alarming rate, with over 50% being lost in the past few decades.
@@ -17,9 +17,9 @@ In the search for novel solutions in coral reef conservation, the development of
 Wang (me, Stanley!) et al. demonstrated the potential capabilities of such a platform in a robot inspired by the Sunburst Butterflyfish (_Chaetodon kleinii_) with a soft underactuated tail actuator.
 This system demonstrated agile swimming locomotion and floating body force application–both critical functionalities for the design of a dexterous underwater manipulator.
 
-{{< figure src="../img/force.png" title="" height=100% width=100% >}}
-
 {{< youtube hjUSrZqYUoo >}}
+
+{{< figure src="../img/force.png" title="Tearing forces applied to a compliant prey based on tail actuation parameters (Wang et al.)" height=100% width=100% >}}
 
 Although prior studies have established fundamental mechanical principles quantifying the kinematics and dynamics of soft underwater actuators, control and intelligence of these robots is an emerging field that requires further investigation.
 In this project, we explore the application of EECS/ME 106A principles toward the design of a comprehensive mechatronics project with sensing, planning, and actuation.

@@ -7,19 +7,29 @@ math: true
 
 # Hardware
 
-{{< figure src="../img/fish-design.png" title="Hardware layout of FishBot" height=100% width=100% >}}
+{{< figure src="../img/hw-design.png" title="Hardware design of FishBot" height=100% width=100% >}}
 
 Our hardware implementation consists of several key components as highlighted in the above figure. This includes:
 
-- **Underactuated Soft Tail** The tail mechanism is the primary actuator for our robot. It consists of a series of rigid segmented "ribs" joined together by revolute joints. From a kinematic perspective, this forms a multi-bar linkage system with a high degree of freedom. However, this entire mechanism is actuated by a single capstan cable drive connected to our servomotor. When tension is applied in either direction in the cable, an overall deflection left/right is respectively produced in the overall tail. This highly underactuated assembly is then encased by a soft flexible sleeve cast from silicone rubber (Smooth-On DragonSkin 10). This sleeve acts as the caudal fin of our fish robot, enabling undulatory propulstion through the water. 
+- **Underactuated Soft Tail** The tail mechanism is the primary actuator for our robot. It consists of a series of rigid segmented "ribs" joined together by revolute joints.
+From a kinematic perspective, this forms a multi-bar linkage system with a high degree of freedom.
+However, this entire mechanism is actuated by a single capstan cable drive connected to our servomotor.
+When tension is applied in either direction in the cable, an overall deflection left/right is respectively produced in the overall tail. This highly underactuated assembly is then encased by a soft flexible sleeve cast from silicone rubber (Smooth-On DragonSkin 10).
+This sleeve acts as the caudal fin of our fish robot, enabling undulatory propulstion through the water. 
 
 {{< figure src="../img/logistic-map.png" title="Logistic mapping for tail angle" height=100% width=100% >}}
 
-- **Waterproof Servomotor** A waterproof servomotor is sourced with appropriate specifications to meet both speed and torque requirements for driving the tail mechanism. After assessing potential solutions, we utilize a FlashHobby 35kg metal geared servo from Amazon, with specifications listed below.
-INSERT SERVO TABLE/FIGURE
-- **Electronics Compartment** A waterproof compartment is used to house a 2S 7.4V LiPo battery used to power our servomotor. This compartment is fabricated from standard PLA material using a desktop FDM 3D printer. The part is then treated for water resistance by painting with an XTC-3D epoxy coating. A lid for easy access is laser cut from 1/4" acrylic, and secured to the compartment with M3 bolts and an O-ring gasket.
-- **ArUco Tag** The pose of the FishBot is extracted from an ArUco tag affixed to the front of the robot. This is created by hand-painting a thin wooden sheet using a permanent marker in order to create a waterproof component (standard printer paper quickly dissolves and loses integrity when submerged).
-- **Microcontroller (WiFi Antenna)** Lastly, a floating anchor is created using a small section of pool noodle. The FishBot is affixed to this anchor at its center of gravity in order to ensure proper balance in the water. The ESP32 microcontroller is then affixed to this float and waterproofed using a plastic sheet. This is done to ensure the antenna on our microcontroller is above water, since we determined that WiFi has substantial issues transmitting through water.
+- **Waterproof Servomotor** A waterproof servomotor is sourced with appropriate specifications to meet both speed and torque requirements for driving the tail mechanism. After assessing potential solutions, we utilize a FlashHobby 35kg metal geared servo from Amazon, with specifications listed in the [additional materials](../additional-materials/) section of the website. 
+- **Electronics Compartment** A waterproof compartment is used to house a 2S 7.4V LiPo battery used to power our servomotor.
+This compartment is fabricated from standard PLA material using a desktop FDM 3D printer.
+The part is then treated for water resistance by painting with an XTC-3D epoxy coating.
+A lid for easy access is laser cut from 1/4" acrylic, and secured to the compartment with M3 bolts and an O-ring gasket.
+- **ArUco Tag** The pose of the FishBot is extracted from an ArUco tag affixed to the front of the robot.
+This is created by hand-painting a thin wooden sheet using a permanent marker in order to create a waterproof component (standard printer paper quickly dissolves and loses integrity when submerged).
+- **Microcontroller (WiFi Antenna)** Lastly, a floating anchor is created using a small section of pool noodle.
+The FishBot is affixed to this anchor at its center of gravity in order to ensure proper balance in the water.
+The ESP32 microcontroller is then affixed to this float and waterproofed using a plastic sheet.
+This is done to ensure the antenna on our microcontroller is above water, since we determined that WiFi has substantial issues transmitting through water.
 
 # Software
 
@@ -179,20 +189,48 @@ def joint_callback(self) -> None:
 
 ### `control.py`
 
-Utilizing the logistic map from our [design](../design/_index.md)
+Based on the distance and angular error, we can determine the command to give to FishBot.
+These are defined as classes, allowing for extensibility:
 
-Given the angular error \\(e_\theta\\), the equation used is
+```python
+class ESP32Command:
+    pass
+
+@dataclass
+class DoneCommand(ESP32Command):
+
+    def __str__(self) -> str:
+        return "DONE\n0"
+
+@dataclass
+class ForwardCommand(ESP32Command):
+
+    def __str__(self) -> str:
+        return "FRWD\n0"
+
+@dataclass
+class TurnCommand(ESP32Command):
+    strength: float
+
+    def __str__(self) -> str:
+        return f"TURN\n{self.strength}"
+```
+
+If both errors are satisfactory, FishBot is given a `DoneCommand`.
+If only the angular error is satisfactory, FishBot is given a `ForwardCommand`.
+Otherwise, FishBot is given a `TurnCommand`.
+Utilizing the logistic map from our [design](../design/), we can derive the necessary strength to drive the fish to a given angle:
 \\[
     |S| =
     \begin{cases}
         S_{max} & |e_\theta| > S_{max} \\\\
         S_{min} & |e_\theta| < S_{min} \\\\
-        e_\theta \cdot \frac{180}{\pi}
+        \frac{1}{B} \ln\left(\frac{A}{|e_\theta|} - 1\right) + C & \text{otherwise}
     \end{cases}
 \\]
-where the sign is determined by the direction of desired motion.
-The result is saturated to safe angular displacements allowed by FishBot's motor.
-<!-- logistic map stuff -->
+where \\(A\\) and \\(B\\) are constants experimentally derived, and \\(e_\theta\\) is the angular error in degrees.
+The sign of the strength is determined by the direction of desired motion.
+The result is saturated to between both safe angular displacements allowed by FishBot's motor and overcoming the viscosity of water.
 
 # Wireless Communication
 
@@ -221,9 +259,11 @@ This setup has a latency on the order of hundreds of milliseconds.
 
 ## ESP32
 
-The ESP32 connects to a locally hosted server that will send the motion commands to the FishBot. By connecting to the server through Wi-Fi, the FishBot can persistently see the commands being fed by the control node from the ROS running on a host system. 
+The ESP32 connects to a locally hosted server that will send the motion commands to the FishBot.
+By connecting to the server through Wi-Fi, the FishBot can persistently see the commands being fed by the control node from the ROS running on a host system. 
 After reading the commands from the server, it decides on one of three motions for the FishBot: move straight forward, turn left by some angle, or turn right by some angle.
-```cpp
+
+```arduino
 String http_GET_request(const char* server) {
   HTTPClient http;
     
@@ -243,10 +283,10 @@ String http_GET_request(const char* server) {
 }
 ```
 
-The ESP32 controls the servo motor. This means that we need to import the `"ESP32Servo.h"` library so that the microcontroller can control the servo motor using the appropiate functions provided by this library. 
+The ESP32 controls the servo motor. This means that we need to import the `ESP32Servo` library so that the microcontroller can control the servo motor using the appropiate functions provided by this library. 
 In conjuction, the ESP32 needs to initialize/set up several components necessary for achieving the desired motion of the FishBot, including the wireless connection, the trim of the servo motor, and the desired frequency.
 
-```cpp
+```arduino
 void setup() {
   // put your setup code here, to run once:
 
@@ -270,9 +310,11 @@ void setup() {
 }
 ```
 
-After initializing the ESP32 with the necessary setup code, we run a loop that constantly downloads and parses the server's messages. This allows the controller to dynamically change the behavior of the servo motor, thereby influencing the FishBot's motion on the fly.
+Before we go into our loop function that will constanly feed motion commands to FishBot, we must define a method for moving its tail.
+The `move_tail` function takes in the total amount of time (`moving_time`) that the FishBot should move for and generates a linear map between the angular displacement of FishBot's tail and the servo motor angle.
+The loop terminates when 
 
-```cpp
+```arduino
 void move_tail(int a, int b, unsigned long moving_time) {
   unsigned long moveStartTime = millis(); // time when start moving
   unsigned long progress = 0;
@@ -283,7 +325,11 @@ void move_tail(int a, int b, unsigned long moving_time) {
     tail_motor.write(angle);
   }
 }
+```
 
+After initializing the ESP32 with the necessary setup code, we run a loop that constantly downloads and parses the server's messages. This allows the controller to dynamically change the behavior of the servo motor, thereby influencing the FishBot's motion on the fly.
+
+```arduino
 void loop() {
   // put your main code here, to run repeatedly:
   String key;
@@ -313,17 +359,53 @@ void loop() {
 
 ## Computer Vision (CV)
 
-The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank. To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed: 
+The goal of the computer vision node is to take an image from the camera, process the image using the OpenCV library in Python, and detect the obstacles that are present in the tank.
+To implement this node, we first downsampled the image by a factor of 2 due to the size of the image and to improve computational speed: 
 
-Then, we perform image processing using the functions in the OpenCV library. To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles: 
+```python
+cv_image = cv2.imread("cv_image.png")
 
-Then, we create a kernel and use it to remove some noise from the blue mask: 
+# downsample cv_image by a factor of 2 using nearest interpolation
+img_d = cv2.resize(src=cv_image, dsize=(cv_image.shape[1]//2, cv_image.shape[0]//2), interpolation=cv2.INTER_NEAREST)
+```
 
-Next, we use this final processed blue mask to form the threshold image of blue colors: 
+Then, we perform image processing using the functions in the OpenCV library.
+To do so, we create a mask by defining lower and upper limits of BGR values to specifically threshold out the blue values in the image, which are the color of the two obstacles.
+Then, we create a kernel and use it to remove some noise from the blue mask. Next, we use this final processed blue mask to form the threshold image of blue colors: 
+
+```python
+hsvFrame = cv2.cvtColor(img_d, cv2.COLOR_BGR2HSV)
+
+# define BGR lower and upper limits to threshold blue color
+blue_lower = np.array([100, 80, 10], np.uint8)
+blue_upper = np.array([120, 255, 255], np.uint8)
+
+# creates a mask
+blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+
+# creates a kernel used to remove from mask
+kernel = np.ones((7, 7), np.uint8)
+
+# remove noise from the mask
+blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_CLOSE, kernel)
+blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+
+# creates thresholded blue image using the mask
+thresholded_img = cv2.bitwise_and(img_d, img_d, mask=blue_mask)
+```
 
 Finally, we upsample the image by a factor of 2 back to the size of the original image before we did any processing: 
 
+```python
+# upsample the image back to the original cv_image by a factor of 2 using nearest interpolation
+img_u = cv2.resize(src=thresholded_img, dsize=(cv_image.shape[1], cv_image.shape[0]), interpolation=cv2.INTER_NEAREST)
+img_u = img_u.astype(np.uint8)
+```
+
 Here are the original and processed/thresholded images: 
 
-As you can see, the code performed the color thresholding pretty well but there are some limitations that requires some additional improvements in the future. One limitation was that since we also had some blue tape on the edges of the tank, the code also caught some of that 
+[ADD 2 IMAGES!!!!!!!!!!!!!]
 
+As you can see, the code performed the color thresholding pretty well but there are some limitations that require some additional improvements in the future.
+One limitation was that since we also had some blue tape on the edges of the tank, the code also caught some of those areas.
+To ensure that only the obstacles are detected by the thresholding algorithm, we need to make sure that only the two obstacles themselves are blue.

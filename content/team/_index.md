@@ -4,17 +4,16 @@ date: 2022-12-11T15:55:55-08:00
 draft: true
 ---
 
+{{< figure src="../img/team.jpg" title="(From left to right) Stanley Wang, Bryan Ngo, Khalid Durani, Shaikh Shamsuddin, Eric Yang" height=100% width=100% >}}
+
 # Stanley Wang
-
-{{< figure src="../img/stanley.jpg" height=50% width=50% >}}
-
+Stanley is currently a senior at UC Berkeley studying Mechanical Engineering.
+He is passionate about bio-inspired robotics and controls, and currently works in the Embodied Dexterity Group with Professor Hannah Stuart. He has been working on FishBot as an independent research project 
 # Bryan Ngo
-
-{{< figure src="../img/Bryan-Ngo.png" height=50% width=50% >}}
 
 Bryan is currently a senior at UC Berkeley studying electrical engineering and computer science.
 He works in the SLICE Lab under Professor Bora Nikolíc on silicon compilers.
-Interests include digital signal processing, computer architecture, and compilers.
+His interests include digital signal processing, computer architecture, and compilers.
 
 ## Contribution
 
@@ -24,8 +23,6 @@ Interests include digital signal processing, computer architecture, and compiler
 - Setting up the ROS network
 
 # Shaikh Shamsuddin
-
-{{< figure src="../img/Shaikh.jpg" height=50% width=50% >}}
 
 Shaikh is currently a senior at UC Berkeley studying electrical engineering and computer science.
 He is a researcher working for Dr. Waqas Khalid in the Nanotechnology laboratory.
@@ -37,12 +34,9 @@ Plans on having a career in embedded systems and intelligent robots in the space
 - Worked on designing and the integration of the motion planning and control node for the ROS structure
 - Incorporated the dynamics of the tail’s logistic curve in regards to how much the fish needs to move in a respective direction and build the overall ROS stack as a whole
 
-
 # Khalid Durani
 
-{{< figure src="../img/khalid.jpg" height=50% width=50% >}}
-
-Khalid is a 4th year undergraduate student at the University of California, Berkeley majoring in Electrical Engineering and Computer Sciences.
+Khalid is currently a senior UC Berkeley studying Electrical Engineering and Computer Sciences.
 He enjoys robotics and VLSI design.
 
 ## Contribution
@@ -51,3 +45,12 @@ He enjoys robotics and VLSI design.
 - Aided in fixing hardware/electronics issues and testing the FishBot in a tank.
 
 # Eric Yang
+
+Eric is a senior undergraduate student studying Electrical Engineering and Computer Sciences (EECS) at UC Berkeley. His interests include integrated circuits for biomedical applications, controls, and robotics. He is currently advised by Prof. Mekhail Anwar in SWARM Lab, where he works on ultrasound power harvesting for an implantable imager chip used in cancer applications.
+
+## Contribution
+
+- Worked on CV and controller node implementations, including the OpenCV implementations for obstacle detection from images taken from the camera and initial controller designs.
+- Helped with various tasks on the hardware side, including the mechanical aspects of the FishBot and dealing with challenges associated with hardware and electronics.
+
+

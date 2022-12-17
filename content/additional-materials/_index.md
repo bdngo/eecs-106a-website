@@ -8,3 +8,5 @@ draft: true
 - [Website source code](https://github.com/bdngo/eecs-106a-website/)
 
 {{< figure src="../img/cad.png" title="CAD rendering of FishBot" height=100% width=100% >}}
+
+{{< figure src="../img/servo.png" title="Servo motor datasheet" height=100% width=100% >}}
